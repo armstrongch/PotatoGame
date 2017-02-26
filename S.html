@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>South Desert</title>
+		<meta charset="utf-8" />
+		<style>
+		canvas 
+		{
+			display: block;
+			margin: auto;
+		}	
+		</style>
+	</head>
+	<body onload="roomStart()">
+	<div>
+		<canvas id="myCanvas" width=512, height = 384, style="border:1px solid #000000;" />
+	</div>
+	<h1 id="text" style = "text-align: center"></h1>
+    <script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var gridSize = 32;
+		var backgroundColor = "#FCD0A1";
+		var collisionGrid = new Array();
+		var q;
+		var t = document.getElementById("text");
+		
+		var potatoImg = new Image(gridSize, gridSize);
+		potatoImg.src = "S\\Potato.png";
+		var cactusImg = new Image(gridSize, gridSize);
+		cactusImg.src = "S\\Cactus.png";
+		var camelImg = new Image(gridSize, gridSize);
+		camelImg.src = "S\\Camel.png";
+		var bearImg = new Image(gridSize, gridSize);
+		bearImg.src = "S\\Bear.png";
+		var pineappleImg = new Image(gridSize, gridSize);
+		pineappleImg.src = "S\\Pineapple.png";
+		var bathImg = new Image(gridSize, gridSize);
+		bathImg.src = "S\\Bath.png";
+		var camelBathImg = new Image(gridSize, gridSize);
+		camelBathImg.src = "S\\CamelBath.png";
+		
+		var player =
+		{
+			xPos: 1,
+			yPos: 4
+		};
+		
+		function roomStart()
+		{
+			ctx.scale(2,2);
+			for (i = 0; i < c.width/gridSize; i += 1)
+			{
+				collisionGrid[i] = new Array();
+				for (j = 0; j < c.height/gridSize; j += 1)
+				{
+					collisionGrid[i][j] = 0;
+				}
+			}
+			initEnvironment();
+			update();
+			document.addEventListener("keydown", keyDown);
+			t.innerHTML = "Use the Arrow Keys.";
+		}
+		
+		function update()
+		{
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, c.width, c.height);
+			drawPlayer();
+			drawEnvironment();
+			drawGrid();
+			t.innerHTML = "";
+		} 
+		
+		function drawGrid()
+		{
+			for (i = 0; i < c.width; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(i, 0);
+				ctx.lineTo(i, c.height);
+				ctx.stroke();
+			}
+			for (i = 0; i < c.height; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(0, i);
+				ctx.lineTo(c.width, i);
+				ctx.stroke();
+			}
+		}
+		
+		function drawPlayer()
+		{
+			ctx.drawImage(potatoImg, player.xPos*gridSize, player.yPos*gridSize);
+		}
+		
+		function keyDown(e)
+		{
+			var keyCode = e.keyCode;
+			var xTarget = player.xPos;
+			var yTarget = player.yPos;
+			//Up = 38
+			if (keyCode == 38)
+			{
+				yTarget -= 1;
+			}
+			//Down = 40
+			if (keyCode == 40)
+			{
+				yTarget += 1;
+			}
+			//Left = 37
+			if (keyCode == 37)
+			{
+				xTarget -= 1;
+			}
+			//Right = 39
+			if (keyCode == 39)
+			{
+				xTarget += 1;
+			}
+			if (yTarget < 0)
+			{
+				window.location.href = "Home.html";
+			}			
+			else if (collisionGrid[xTarget][yTarget] == 0)
+			{
+				if (collisionGrid[5][player.yPos] == 2)
+				{
+					collisionGrid[5][player.yPos] = 0;
+					player.xPos = xTarget;
+					player.yPos = yTarget;
+					if (collisionGrid[5][player.yPos] == 5)
+					{
+						collisionGrid[5][player.yPos] = 6;
+					}
+					else
+					{
+						collisionGrid[5][player.yPos] = 2;
+					}
+				}
+				else
+				{
+					player.xPos = xTarget;
+					player.yPos = yTarget;
+				}
+				update();
+			}
+			else if (collisionGrid[xTarget][yTarget] == 1)
+			{
+				t.innerHTML = "The CACTUS is polite and sophisticated, despite it's needles.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 2)
+			{
+				t.innerHTML = "The disgruntled CAMEL is in dire need of a bath.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 3)
+			{
+				if (collisionGrid[6][2] == 0)
+				{
+					collisionGrid[3][0] = 0;
+					update();
+					t.innerHTML = "The PINEAPPLE is an excellent addition to the stew. In gratitude, the WIZARD molds the CACTUS fields to his will, forming a path.";
+				}
+				else
+				{
+					t.innerHTML = "The WIZARD needs a few more ingredients for his stew.";
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 4)
+			{
+				collisionGrid[xTarget][yTarget] = 0;
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				update();
+				t.innerHTML = "This PINEAPPLE would be delicious in a stew.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 6)
+			{
+				t.innerHTML = "The CAMEL is much cleaner, though equally disgruntled.";
+			}
+		}
+		
+		function initEnvironment()
+		{	
+			for (i = 0; i < 8; i++)
+			{
+				collisionGrid[i][0] = 1;
+				collisionGrid[i][5] = 1;
+			}
+			for (i = 1; i < 5; i++)
+			{
+				collisionGrid[0][i] = 1;
+				collisionGrid[7][i] = 1;
+			}
+			collisionGrid[3][3] = 1;
+			collisionGrid[4][1] = 1;
+			collisionGrid[4][2] = 1;
+			collisionGrid[2][1] = 1;
+			collisionGrid[5][player.yPos] = 2;
+			collisionGrid[1][3] = 3;
+			collisionGrid[6][2] = 4;
+			collisionGrid[5][1] = 5;
+			
+		}
+		
+		function drawEnvironment()
+		{
+			for (i = 0; i < c.width/gridSize; i++)
+			{
+				for (j = 0; j < c.height/gridSize; j++)
+				{
+					if (collisionGrid[i][j] == 1)
+					{
+						ctx.drawImage(cactusImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 2)
+					{
+						ctx.drawImage(camelImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 3)
+					{
+						ctx.drawImage(bearImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 4)
+					{
+						ctx.drawImage(pineappleImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 5)
+					{
+						ctx.drawImage(bathImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 6)
+					{
+						ctx.drawImage(camelBathImg, i*gridSize, j*gridSize);
+					}
+				}
+			}
+		}
+    </script>
+	</body>
+</html>
