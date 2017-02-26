@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Screen</title>
+		<meta charset="utf-8" />
+		<style>
+		canvas 
+		{
+			display: block;
+			margin: auto;
+		}	
+		</style>
+	</head>
+	<body onload="roomStart()">
+	<div>
+		<canvas id="myCanvas" width=512, height = 384, style="border:1px solid #000000;" />
+	</div>
+	<h1 id="text" style = "text-align: center"></h1>
+    <script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var gridSize = 32;
+		var backgroundColor = "#2AA838";
+		var collisionGrid = new Array();
+		var q;
+		var t = document.getElementById("text");
+		
+		var potatoImg = new Image(gridSize, gridSize);
+		potatoImg.src = "N\\Potato.png";
+		var LRfenceImg = new Image(gridSize, gridSize);
+		LRfenceImg.src = "N\\LRFence.png";
+		var happyFenceImg = new Image(gridSize, gridSize);
+		happyFenceImg.src = "N\\HappyFence.png";
+		var barnImg = new Image(gridSize, gridSize);
+		barnImg.src = "N\\Barn.png";
+		var cowImg = new Image(gridSize, gridSize);
+		cowImg.src = "N\\Cow.png";
+		var bellImg = new Image(gridSize, gridSize);
+		bellImg.src = "N\\Bell.png";
+		
+		var player =
+		{
+			xPos: 3,
+			yPos: 4
+		};
+		
+		function roomStart()
+		{
+			ctx.scale(2,2);
+			for (i = 0; i < c.width/gridSize; i += 1)
+			{
+				collisionGrid[i] = new Array();
+				for (j = 0; j < c.height/gridSize; j += 1)
+				{
+					collisionGrid[i][j] = 0;
+				}
+			}
+			initEnvironment();
+			update();
+			document.addEventListener("keydown", keyDown);
+			t.innerHTML = "Use the Arrow Keys.";
+		}
+		
+		function update()
+		{
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, c.width, c.height);
+			drawPlayer();
+			drawEnvironment();
+			drawGrid();
+			t.innerHTML = "";
+		} 
+		
+		function drawGrid()
+		{
+			for (i = 0; i < c.width; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(i, 0);
+				ctx.lineTo(i, c.height);
+				ctx.stroke();
+			}
+			for (i = 0; i < c.height; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(0, i);
+				ctx.lineTo(c.width, i);
+				ctx.stroke();
+			}
+		}
+		
+		function drawPlayer()
+		{
+			ctx.drawImage(potatoImg, player.xPos*gridSize, player.yPos*gridSize);
+		}
+		
+		function keyDown(e)
+		{
+			var keyCode = e.keyCode;
+			var xTarget = player.xPos;
+			var yTarget = player.yPos;
+			var xDir = 0;
+			var yDir = 0;
+			//Up = 38
+			if (keyCode == 38)
+			{
+				yTarget -= 1;
+				yDir = -1;
+			}
+			//Down = 40
+			if (keyCode == 40)
+			{
+				yTarget += 1;
+				yDir = 1;
+			}
+			//Left = 37
+			if (keyCode == 37)
+			{
+				xTarget -= 1;
+				xDir = -1;
+			}
+			//Right = 39
+			if (keyCode == 39)
+			{
+				xTarget += 1;
+				xDir = 1;
+			}
+			
+			if (yTarget > 5)
+			{
+				window.location.href = "Home.html";;
+			}			
+			else if (collisionGrid[xTarget][yTarget] == 0)
+			{
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				update();
+			}
+			else if (collisionGrid[xTarget][yTarget] == 1)
+			{
+				t.innerHTML = "The FENCE is unresponsive. It may be playing hard-to-get.";
+			}
+			else if ((collisionGrid[xTarget][yTarget] == 2) || (collisionGrid[xTarget][yTarget] == 3))
+			{
+				t.innerHTML = "Stroking the side of the BARN is oddly comforting.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 4)
+			{
+				t.innerHTML = "You are intimidated by the dark abyss of the BARN.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 5)
+			{
+				var check = false;
+				if (collisionGrid[xTarget+xDir][yTarget+yDir] == 0)
+				{
+					collisionGrid[xTarget][yTarget] = 0;
+					collisionGrid[xTarget+xDir][yTarget+yDir] = 5;
+					player.xPos = xTarget;
+					player.yPos = yTarget;
+					update();
+					t.innerHTML = "MOO?";
+				}
+				else if (collisionGrid[xTarget+xDir][yTarget+yDir] == 4)
+				{
+					collisionGrid[xTarget][yTarget] = 0;
+					player.xPos = xTarget;
+					player.yPos = yTarget;
+					t.innerHTML = "MOO?";
+					check = true;
+					for (i = 1; i < 7; i++)
+					{
+						for (j = 1; j < 5; j++)
+						{
+							if (collisionGrid[i][j] == 5)
+							{
+								i = 7;
+								j = 5;
+								check = false;
+							}
+						}
+					}
+					if (check)
+					{
+						for (i = 0; i < 8; i++)
+						{
+							for (j = 0; j < 6; j++)
+							{
+								if (collisionGrid[i][j] == 6)
+								{
+									collisionGrid[i][j] = 7;
+								}
+								else if (collisionGrid[i][j] == 1)
+								{
+									collisionGrid[i][j] = 7;
+								}
+							}
+						}
+						collisionGrid[4][5] = 0;
+						update();
+						t.innerHTML = "The bovine gods smile upon you.";
+					}
+					else
+					{
+						update();
+						t.innerHTML = "MOO?";
+					}
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 6)
+			{
+				for (i = 1; i < 7; i++)
+				{
+					for (j = 1; j < 5; j++)
+					{
+						collisionGrid[i][j] = 0;
+					}
+				}
+				collisionGrid[2][2] = 5;
+				collisionGrid[3][3] = 5;
+				collisionGrid[4][2] = 5;
+				collisionGrid[5][3] = 5;
+				update();
+				t.innerHTML = "The COWS frolic through the meadow at the sound of the BELL.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 7)
+			{
+				t.innerHTML = "The FENCE emanates glee.";
+			}
+		}
+		
+		function initEnvironment()
+		{	
+			collisionGrid[0][5] = 1;
+			collisionGrid[1][5] = 1;
+			collisionGrid[2][5] = 1;
+			collisionGrid[3][5] = 1;
+			collisionGrid[4][5] = 6;
+			collisionGrid[5][5] = 1;
+			collisionGrid[6][5] = 1;
+			collisionGrid[7][5] = 1;
+			collisionGrid[0][5] = 1;
+			collisionGrid[0][0] = 1;
+			collisionGrid[1][0] = 1;
+			collisionGrid[2][0] = 1;
+			collisionGrid[3][0] = 6;
+			collisionGrid[4][0] = 1;
+			collisionGrid[5][0] = 1;
+			collisionGrid[6][0] = 1;
+			collisionGrid[7][0] = 1;
+			collisionGrid[0][1] = 1;
+			collisionGrid[0][2] = 6;
+			collisionGrid[0][3] = 1;
+			collisionGrid[0][4] = 1;
+			collisionGrid[7][1] = 2;
+			collisionGrid[7][2] = 4;
+			collisionGrid[7][3] = 3;
+			collisionGrid[7][4] = 1;
+			collisionGrid[2][2] = 5;
+			collisionGrid[3][3] = 5;
+			collisionGrid[4][2] = 5;
+			collisionGrid[5][3] = 5;
+		}
+		
+		function drawEnvironment()
+		{
+			for (i = 0; i < c.width/gridSize; i++)
+			{
+				for (j = 0; j < c.height/gridSize; j++)
+				{
+					if (collisionGrid[i][j] == 1)
+					{
+						ctx.drawImage(LRfenceImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 2)
+					{
+						ctx.drawImage(barnImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 5)
+					{
+						ctx.drawImage(cowImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 6)
+					{
+						ctx.drawImage(bellImg, i*gridSize, j*gridSize);
+					}
+					if (collisionGrid[i][j] == 7)
+					{
+						ctx.drawImage(happyFenceImg, i*gridSize, j*gridSize);
+					}
+				}
+			}
+		}
+    </script>
+	</body>
+</html>

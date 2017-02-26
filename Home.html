@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Screen</title>
+		<meta charset="utf-8" />
+		<style>
+		canvas 
+		{
+			display: block;
+			margin: auto;
+		}	
+		</style>
+	</head>
+	<body onload="roomStart()">
+	<div>
+		<canvas id="myCanvas" width=512, height = 384, style="border:1px solid #000000;" />
+	</div>
+	<h1 id="text" style = "text-align: center"></h1>
+    <script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var gridSize = 32;
+		var backgroundColor = "#BAA898";
+		var collisionGrid = new Array();
+		var q;
+		var t = document.getElementById("text");
+		
+		var potatoImg = new Image(gridSize, gridSize);
+		potatoImg.src = "Home\\Potato.png";
+		var treeImg = new Image(gridSize, gridSize);
+		treeImg.src = "Home\\Tree.png";
+		var happyTreeImg = new Image(gridSize, gridSize);
+		happyTreeImg.src = "Home\\HappyTree.png"
+		var altarImg = new Image(gridSize, gridSize);
+		altarImg.src = "Home\\Altar.png";
+		var altar2Img = new Image(gridSize, gridSize);
+		altar2Img.src = "Home\\Altar2.png";
+		var bushImg = new Image(gridSize, gridSize);
+		bushImg.src = "Home\\Bush.png";
+		
+		var player =
+		{
+			xPos: 1,
+			yPos: 1
+		};
+		
+		function roomStart()
+		{
+			ctx.scale(2,2);
+			for (i = 0; i < c.width/gridSize; i += 1)
+			{
+				collisionGrid[i] = new Array();
+				for (j = 0; j < c.height/gridSize; j += 1)
+				{
+					collisionGrid[i][j] = 0;
+				}
+			}
+			initEnvironment();
+			update();
+			document.addEventListener("keydown", keyDown);
+			t.innerHTML = "Use the Arrow Keys.";
+		}
+		
+		function update()
+		{
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, c.width, c.height);
+			drawPlayer();
+			drawEnvironment();
+			drawGrid();
+			t.innerHTML = "";
+		} 
+		
+		function drawGrid()
+		{
+			for (i = 0; i < c.width; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(i, 0);
+				ctx.lineTo(i, c.height);
+				ctx.stroke();
+			}
+			for (i = 0; i < c.height; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(0, i);
+				ctx.lineTo(c.width, i);
+				ctx.stroke();
+			}
+		}
+		
+		function drawPlayer()
+		{
+			ctx.drawImage(potatoImg, player.xPos*gridSize, player.yPos*gridSize);
+		}
+		
+		function keyDown(e)
+		{
+			var keyCode = e.keyCode;
+			var xTarget = player.xPos;
+			var yTarget = player.yPos;
+			//Up = 38
+			if (keyCode == 38)
+			{
+				yTarget -= 1;
+			}
+			//Down = 40
+			if (keyCode == 40)
+			{
+				yTarget += 1;
+			}
+			//Left = 37
+			if (keyCode == 37)
+			{
+				xTarget -= 1;
+			}
+			//Right = 39
+			if (keyCode == 39)
+			{
+				xTarget += 1;
+			}
+			if (yTarget < 0)
+			{
+				window.location.href = "N.html";
+			}			
+			else if (collisionGrid[xTarget][yTarget] == 0)
+			{
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				update();
+			}
+			else if (collisionGrid[xTarget][yTarget] == 1)
+			{
+				collisionGrid[xTarget][yTarget] = 2;
+				update();
+				t.innerHTML = "You lovingly caress the TREE.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 3)
+			{
+				var check = true;
+				for (i = 0; i < c.width/gridSize; i++)
+				{
+					for (j = 0; j < c.height/gridSize; j++)
+					{
+						if (collisionGrid[i][j] == 1)
+						{
+							i = c.width/gridSize;
+							j = c.height/gridSize;
+							check = false;
+						}
+					}
+				}
+				if (check)
+				{
+					collisionGrid[xTarget][yTarget] = 4;
+					collisionGrid[2][0] = 0;
+					collisionGrid[3][0] = 0;
+					update();
+					t.innerHTML = "You pray at the ALTAR OF THE FOREST. The forest gods offer their blessings for your journey.";
+				}
+				else
+				{
+					t.innerHTML = "You pray at the ALTAR OF THE FOREST. The forest gods are restless.";
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 5)
+			{
+				t.innerHTML = "You playfully jostle the BUSH.";
+			}
+		}
+		
+		function initEnvironment()
+		{	
+			collisionGrid[0][0] = 5;
+			collisionGrid[3][2] = 1;
+			collisionGrid[5][0] = 1;
+			collisionGrid[0][4] = 1;
+			collisionGrid[2][5] = 1;
+			collisionGrid[4][4] = 1;
+			collisionGrid[6][2] = 3;
+			collisionGrid[1][0] = 1;
+			collisionGrid[2][0] = 5;
+			collisionGrid[3][0] = 5;
+			collisionGrid[4][0] = 5;
+			collisionGrid[6][0] = 5;
+			collisionGrid[7][0] = 5;
+			collisionGrid[0][5] = 5;
+			collisionGrid[1][5] = 5;
+			collisionGrid[3][5] = 5;
+			collisionGrid[4][5] = 5;
+			collisionGrid[5][5] = 5;
+			collisionGrid[6][5] = 5;
+			collisionGrid[7][5] = 5;
+			collisionGrid[0][1] = 5;
+			collisionGrid[0][2] = 5;
+			collisionGrid[0][3] = 5;
+			collisionGrid[7][1] = 5;
+			collisionGrid[7][2] = 5;
+			collisionGrid[7][3] = 5;
+			collisionGrid[7][4] = 5;
+		}
+		
+		function drawEnvironment()
+		{
+			for (i = 0; i < c.width/gridSize; i++)
+			{
+				for (j = 0; j < c.height/gridSize; j++)
+				{
+					if (collisionGrid[i][j] == 1)
+					{
+						ctx.drawImage(treeImg, i*gridSize, j*gridSize);
+					}
+					else if (collisionGrid[i][j] == 2)
+					{
+						ctx.drawImage(happyTreeImg, i*gridSize, j*gridSize);
+					}
+					else if (collisionGrid[i][j] == 3)
+					{
+						ctx.drawImage(altarImg, i*gridSize, j*gridSize);
+					}
+					else if (collisionGrid[i][j] == 4)
+					{
+						ctx.drawImage(altar2Img, i*gridSize, j*gridSize);
+					}
+					else if (collisionGrid[i][j] == 5)
+					{
+						ctx.drawImage(bushImg, i*gridSize, j*gridSize);
+					}
+				}
+			}
+		}
+    </script>
+	</body>
+</html>
