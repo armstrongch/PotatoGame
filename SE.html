@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Potato Lad</title>
+		<meta charset="utf-8" />
+		<style>
+		canvas 
+		{
+			display: block;
+			margin: auto;
+		}	
+		</style>
+	</head>
+	<body onload="roomStart()">
+	<div>
+		<canvas id="myCanvas" width=512, height = 384, style="border:1px solid #000000;" />
+	</div>
+	<h1 id="text" style = "text-align: center"></h1>
+    <script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var gridSize = 32;
+		var backgroundColor = "#FFC9C9";
+		var collisionGrid = new Array();
+		var q;
+		var t = document.getElementById("text");
+		var imagesLoaded = [false, false, false, false, false, false, false, false];
+		var allImagesLoaded = false;
+		var monsterX = 6;
+		var monsterY = 0;
+		
+		var potatoImg = new Image(gridSize, gridSize);
+		potatoImg.src = "SE\\Potato.png";
+		potatoImg.onload = LI(0);
+		
+		var palmTreeImg = new Image(gridSize, gridSize);
+		palmTreeImg.src = "SE\\PalmTree.png";
+		palmTreeImg.onload = LI(1);
+		
+		var cannonImg = new Image(gridSize, gridSize);
+		cannonImg.src = "SE\\Cannon.png";
+		cannonImg.onload = LI(2);
+		
+		var cannon2Img = new Image(gridSize, gridSize);
+		cannon2Img.src = "SE\\Cannon2.png";
+		cannon2Img.onload = LI(3);
+		
+		var pirateImg = new Image(gridSize, gridSize);
+		pirateImg.src = "SE\\Pirate.png";
+		pirateImg.onload = LI(4);
+		
+		var SM1Img = new Image(gridSize, gridSize);
+		SM1Img.src = "SE\\SM1.png";
+		SM1Img.onload = LI(5);
+		
+		var SM2Img = new Image(gridSize, gridSize);
+		SM2Img.src = "SE\\SM2.png";
+		SM2Img.onload = LI(6);
+		
+		var SM3Img = new Image(gridSize, gridSize);
+		SM3Img.src = "SE\\SM3.png";
+		SM3Img.onload = LI(7);
+		
+		var player =
+		{
+			xPos: 1,
+			yPos: 1
+		};
+		
+		function LI(n)
+		{
+			imagesLoaded[n] = true;
+			var sum = 0;
+			for (i = 0; i < imagesLoaded.length; i++)
+			{
+				sum += imagesLoaded[i];
+			}
+			if (sum == imagesLoaded.length)
+			{
+				allImagesLoaded = true;
+			}
+		}
+		
+		function roomStart()
+		{
+			t.innerHTML = "Loading";
+			while(!allImagesLoaded)
+			{
+				//WAIT
+			}
+			ctx.scale(2,2);
+			for (i = 0; i < c.width/gridSize; i += 1)
+			{
+				collisionGrid[i] = new Array();
+				for (j = 0; j < c.height/gridSize; j += 1)
+				{
+					collisionGrid[i][j] = 0;
+				}
+			}
+			initEnvironment();
+			update();
+			document.addEventListener("keydown", keyDown);
+			t.innerHTML = "Use the Arrow Keys.";
+		}
+		
+		function update()
+		{
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, c.width, c.height);
+			drawPlayer();
+			drawEnvironment();
+			drawGrid();
+			t.innerHTML = "";
+		} 
+		
+		function drawGrid()
+		{
+			for (i = 0; i < c.width; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(i, 0);
+				ctx.lineTo(i, c.height);
+				ctx.stroke();
+			}
+			for (i = 0; i < c.height; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(0, i);
+				ctx.lineTo(c.width, i);
+				ctx.stroke();
+			}
+		}
+		
+		function drawPlayer()
+		{
+			ctx.drawImage(potatoImg, player.xPos*gridSize, player.yPos*gridSize);
+		}
+		
+		function keyDown(e)
+		{
+			var keyCode = e.keyCode;
+			var xTarget = player.xPos;
+			var yTarget = player.yPos;
+			var monsterH = collisionGrid[monsterX][monsterY];
+			collisionGrid[monsterX][monsterY] = 100;
+			if (monsterX == 6)
+			{
+				if (monsterY == 5)
+				{
+					monsterX = 7;
+				}
+				else
+				{
+					monsterY++;
+				}
+			}
+			else
+			{
+				if (monsterY == 0)
+				{
+					monsterX = 6;
+				}
+				else
+				{
+					monsterY--;
+				}
+			}
+			collisionGrid[monsterX][monsterY] = monsterH;
+			update();
+			//Up = 38
+			if (keyCode == 38)
+			{
+				yTarget -= 1;
+			}
+			//Down = 40
+			if (keyCode == 40)
+			{
+				yTarget += 1;
+			}
+			//Left = 37
+			if (keyCode == 37)
+			{
+				xTarget -= 1;
+			}
+			//Right = 39
+			if (keyCode == 39)
+			{
+				xTarget += 1;
+			}	
+			if (xTarget < 0)
+			{
+				window.location.href = "S.html";
+			}			
+			else if (collisionGrid[xTarget][yTarget] == 0)
+			{
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				update();
+			}
+			else if (collisionGrid[xTarget][yTarget] == 1)
+			{
+				t.innerHTML = "The PALM TREES sway mesmerizingly.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 2)
+			{
+				collisionGrid[xTarget][yTarget] = 3;
+				if ((monsterY == yTarget) && (collisionGrid[monsterX][monsterY] != 0))
+				{
+					collisionGrid[monsterX][monsterY]++;
+					if (collisionGrid[monsterX][monsterY] == 108)
+					{
+						collisionGrid[monsterX][monsterY] = 100;
+						update();
+						t.innerHTML = "The SEAMONSTER sheepishly vanishes beneath the waves."
+					}
+					else
+					{
+						update();
+						t.innerHTML = "The SEAMONSTER is visibly wounded, and a little disappointed in you."
+					}
+				}
+				else
+				{
+					update();
+					t.innerHTML = "BANG?!";
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 3)
+			{
+				t.innerHTML = "This CANNON seems lonesome without a cannonball inside.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 4)
+			{
+				if (collisionGrid[monsterX][monsterY] == 100)
+				{
+					collisionGrid[0][3] = 0;
+					collisionGrid[0][4] = 0;
+					update();
+					t.innerHTML = "The PIRATE kisses you passionately and sends you on your way."
+				}
+				else
+				{
+					if ((collisionGrid[3][1] == 2) 
+					&& (collisionGrid[4][2] == 2) 
+					&& (collisionGrid[5][3] == 2))
+					{
+						t.innerHTML = "The PIRATE is suspicious of landlubbers. And PALM TREES."
+					}
+					else
+					{
+						collisionGrid[3][1] = 2;
+						collisionGrid[4][2] = 2;
+						collisionGrid[5][3] = 2;
+						collisionGrid[monsterX][monsterY] = 105;
+						update();
+						t.innerHTML = "The PIRATE winks playfully as he reloads the CANNONS.";
+					}
+				}
+			}
+		}
+		
+		function initEnvironment()
+		{	
+			for (i = 0; i < 6; i++)
+			{
+				collisionGrid[7][i] = 100;
+				collisionGrid[6][i] = 100;
+			}
+			for (i = 0; i < 6; i++)
+			{
+				collisionGrid[i][0] = 1;
+				collisionGrid[i][5] = 1;
+			}
+			for (i = 1; i < 5; i++)
+			{
+				collisionGrid[0][i] = 1;
+			}
+			collisionGrid[3][1] = 2;
+			collisionGrid[4][2] = 2;
+			collisionGrid[5][3] = 2;
+			collisionGrid[2][4] = 4;
+			collisionGrid[6][0] += 5;
+			MonsterX = 6;
+			MonsterY = 0;
+		}
+		
+		function drawEnvironment()
+		{
+			var e;
+			for (i = 0; i < c.width/gridSize; i++)
+			{
+				for (j = 0; j < c.height/gridSize; j++)
+				{
+					e = collisionGrid[i][j];
+					if (e >= 100)
+					{
+						ctx.fillStyle = "#79ADDC";
+						ctx.fillRect(i*gridSize, j*gridSize, gridSize, gridSize);
+						e -= 100;
+					}
+					if (e == 1)
+					{
+						ctx.drawImage(palmTreeImg, i*gridSize, j*gridSize);
+					}
+					else if (e == 2)
+					{
+						ctx.drawImage(cannonImg, i*gridSize, j*gridSize);
+					}
+					else if (e == 3)
+					{
+						ctx.drawImage(cannon2Img, i*gridSize, j*gridSize);
+					}
+					else if (e == 4)
+					{
+						ctx.drawImage(pirateImg, i*gridSize, j*gridSize);
+					}
+					else if (e == 5)
+					{
+						ctx.drawImage(SM1Img, i*gridSize, j*gridSize);
+					}
+					else if (e == 6)
+					{
+						ctx.drawImage(SM2Img, i*gridSize, j*gridSize);
+					}
+					else if (e == 7)
+					{
+						ctx.drawImage(SM3Img, i*gridSize, j*gridSize);
+					}
+				}
+			}
+		}
+    </script>
+	</body>
+</html>
