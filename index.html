@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Home Forest</title>
+		<title>Potato Lad</title>
 		<meta charset="utf-8" />
 		<style>
 		canvas 
@@ -24,19 +24,32 @@
 		var collisionGrid = new Array();
 		var q;
 		var t = document.getElementById("text");
+		var imagesLoaded = [false, false, false, false, false, false];
+		var allImagesLoaded = false;
 		
 		var potatoImg = new Image(gridSize, gridSize);
 		potatoImg.src = "Home\\Potato.png";
+		potatoImg.onload = LI(0);
+		
 		var treeImg = new Image(gridSize, gridSize);
 		treeImg.src = "Home\\Tree.png";
+		treeImg.onload = LI(1);
+		
 		var happyTreeImg = new Image(gridSize, gridSize);
-		happyTreeImg.src = "Home\\HappyTree.png"
+		happyTreeImg.src = "Home\\HappyTree.png";
+		happyTreeImg.onload = LI(2);
+		
 		var altarImg = new Image(gridSize, gridSize);
 		altarImg.src = "Home\\Altar.png";
+		altarImg.onload = LI(3);
+		
 		var altar2Img = new Image(gridSize, gridSize);
 		altar2Img.src = "Home\\Altar2.png";
+		altar2Img.onload = LI(4);
+		
 		var bushImg = new Image(gridSize, gridSize);
 		bushImg.src = "Home\\Bush.png";
+		bushImg.onload = LI(5);
 		
 		var player =
 		{
@@ -44,8 +57,27 @@
 			yPos: 1
 		};
 		
+		function LI(n)
+		{
+			imagesLoaded[n] = true;
+			var sum = 0;
+			for (i = 0; i < imagesLoaded.length; i++)
+			{
+				sum += imagesLoaded[i];
+			}
+			if (sum == imagesLoaded.length)
+			{
+				allImagesLoaded = true;
+			}
+		}
+		
 		function roomStart()
 		{
+			t.innerHTML = "Loading";
+			while(!allImagesLoaded)
+			{
+				//WAIT
+			}
 			ctx.scale(2,2);
 			for (i = 0; i < c.width/gridSize; i += 1)
 			{
@@ -123,9 +155,13 @@
 			{
 				window.location.href = "N.html";
 			}	
-			if (yTarget > 5)
+			else if (yTarget > 5)
 			{
 				window.location.href = "S.html";
+			}	
+			else if (xTarget < 0)
+			{
+				window.location.href = "W.html";
 			}			
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
@@ -159,6 +195,8 @@
 					collisionGrid[xTarget][yTarget] = 4;
 					collisionGrid[2][0] = 0;
 					collisionGrid[3][0] = 0;
+					collisionGrid[0][2] = 0;
+					collisionGrid[0][3] = 0;
 					collisionGrid[5][5] = 0;
 					collisionGrid[6][5] = 0;
 					update();
