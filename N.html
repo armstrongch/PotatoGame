@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>North Cow Field</title>
+		<title>Potato Lad</title>
 		<meta charset="utf-8" />
 		<style>
 		canvas 
@@ -24,19 +24,32 @@
 		var collisionGrid = new Array();
 		var q;
 		var t = document.getElementById("text");
+		var imagesLoaded = [false, false, false, false, false, false];
+		var allImagesLoaded = false;
 		
 		var potatoImg = new Image(gridSize, gridSize);
 		potatoImg.src = "N\\Potato.png";
+		potatoImg.onload = LI(0);
+		
 		var LRfenceImg = new Image(gridSize, gridSize);
 		LRfenceImg.src = "N\\LRFence.png";
+		LRfenceImg.onload = LI(1);
+		
 		var happyFenceImg = new Image(gridSize, gridSize);
 		happyFenceImg.src = "N\\HappyFence.png";
+		happyFenceImg.onload = LI(2);
+		
 		var barnImg = new Image(gridSize, gridSize);
 		barnImg.src = "N\\Barn.png";
+		barnImg.onload = LI(3);
+		
 		var cowImg = new Image(gridSize, gridSize);
 		cowImg.src = "N\\Cow.png";
+		cowImg.onload = LI(4);
+		
 		var bellImg = new Image(gridSize, gridSize);
 		bellImg.src = "N\\Bell.png";
+		bellImg.onload = LI(5);
 		
 		var player =
 		{
@@ -44,8 +57,27 @@
 			yPos: 4
 		};
 		
+		function LI(n)
+		{
+			imagesLoaded[n] = true;
+			var sum = 0;
+			for (i = 0; i < imagesLoaded.length; i++)
+			{
+				sum += imagesLoaded[i];
+			}
+			if (sum == imagesLoaded.length)
+			{
+				allImagesLoaded = true;
+			}
+		}
+		
 		function roomStart()
 		{
+			t.innerHTML = "Loading";
+			while(!allImagesLoaded)
+			{
+				//WAIT
+			}
 			ctx.scale(2,2);
 			for (i = 0; i < c.width/gridSize; i += 1)
 			{
@@ -128,7 +160,7 @@
 			
 			if (yTarget > 5)
 			{
-				window.location.href = "Home.html";;
+				window.location.href = "index.html";;
 			}			
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
