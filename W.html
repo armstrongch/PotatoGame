@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Potato Lad</title>
+		<meta charset="utf-8" />
+		<style>
+		canvas 
+		{
+			display: block;
+			margin: auto;
+		}	
+		</style>
+	</head>
+	<body onload="roomStart()">
+	<div>
+		<canvas id="myCanvas" width=512, height = 384, style="border:1px solid #000000;" />
+	</div>
+	<h1 id="text" style = "text-align: center"></h1>
+    <script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var gridSize = 32;
+		var backgroundColor = "#E8E1C5";
+		var collisionGrid = new Array();
+		var q;
+		var t = document.getElementById("text");
+		var imagesLoaded = [false, false, false, false, false, false];
+		var allImagesLoaded = false;
+		
+		var potatoImg = new Image(gridSize, gridSize);
+		potatoImg.src = "W\\Potato.png";
+		potatoImg.onload = LI(0);
+		
+		var shelfImg = new Image(gridSize, gridSize);
+		shelfImg.src = "W\\Shelf.png";
+		shelfImg.onload = LI(1);
+		
+		var brickImg = new Image(gridSize, gridSize);
+		brickImg.src = "W\\Brick.png";
+		brickImg.onload = LI(2);
+		
+		var outsideImg = new Image(gridSize, gridSize);
+		outsideImg.src = "W\\Outside.png";
+		outsideImg.onload = LI(3);
+		
+		var ghostImg = new Image(gridSize, gridSize);
+		ghostImg.src = "W\\Ghost.png";
+		ghostImg.onload = LI(4);
+		
+		var goggleImg = new Image(gridSize, gridSize);
+		goggleImg.src = "W\\Goggles.png";
+		goggleImg.onload = LI(5);
+		
+		var player =
+		{
+			xPos: 3,
+			yPos: 4
+		};
+		
+		function LI(n)
+		{
+			imagesLoaded[n] = true;
+			var sum = 0;
+			for (i = 0; i < imagesLoaded.length; i++)
+			{
+				sum += imagesLoaded[i];
+			}
+			if (sum == imagesLoaded.length)
+			{
+				allImagesLoaded = true;
+			}
+		}
+		
+		function roomStart()
+		{
+			t.innerHTML = "Loading";
+			while(!allImagesLoaded)
+			{
+				//WAIT
+			}
+			ctx.scale(2,2);
+			for (i = 0; i < c.width/gridSize; i += 1)
+			{
+				collisionGrid[i] = new Array();
+				for (j = 0; j < c.height/gridSize; j += 1)
+				{
+					collisionGrid[i][j] = 0;
+				}
+			}
+			initEnvironment();
+			update();
+			document.addEventListener("keydown", keyDown);
+			t.innerHTML = "Use the Arrow Keys.";
+		}
+		
+		function update()
+		{
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, c.width, c.height);
+			drawPlayer();
+			drawEnvironment();
+			drawGrid();
+			t.innerHTML = "";
+		} 
+		
+		function drawGrid()
+		{
+			for (i = 0; i < c.width; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(i, 0);
+				ctx.lineTo(i, c.height);
+				ctx.stroke();
+			}
+			for (i = 0; i < c.height; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(0, i);
+				ctx.lineTo(c.width, i);
+				ctx.stroke();
+			}
+		}
+		
+		function drawPlayer()
+		{
+			ctx.drawImage(potatoImg, player.xPos*gridSize, player.yPos*gridSize);
+		}
+		
+		function keyDown(e)
+		{
+			var keyCode = e.keyCode;
+			var xTarget = player.xPos;
+			var yTarget = player.yPos;
+			//Up = 38
+			if (keyCode == 38)
+			{
+				yTarget -= 1;
+			}
+			//Down = 40
+			if (keyCode == 40)
+			{
+				yTarget += 1;
+			}
+			//Left = 37
+			if (keyCode == 37)
+			{
+				xTarget -= 1;
+			}
+			//Right = 39
+			if (keyCode == 39)
+			{
+				xTarget += 1;
+			}
+			if (xTarget > 7)
+			{
+				window.location.href = "index.html";
+			}				
+			else if (collisionGrid[xTarget][yTarget] == 0)
+			{
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				if (collisionGrid[6][4] == 5)
+				{
+					if ((yTarget <= 3) && (backgroundColor != "black"))
+					{
+						backgroundColor = "black";
+						update();
+						t.innerHTML = "The lights flicker eerily.";
+					}
+					else if ((yTarget > 3) &&(backgroundColor != "#E8E1C5"))
+					{
+						backgroundColor = "#E8E1C5";
+						update();
+						t.innerHTML = "The lights flicker eerily.";
+					}
+					else
+					{
+						update();
+					}
+				}
+				else
+				{
+					update();
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 1)
+			{
+				t.innerHTML = "The snacks on the convenience store SHELVES are probably expired.";
+			}
+			else if ((collisionGrid[xTarget][yTarget] == 2) || (collisionGrid[xTarget][yTarget] == 3))
+			{
+				t.innerHTML = "The BRICKS are BRICKS.";
+			}
+			else if (collisionGrid[xTarget][yTarget] == 4)
+			{
+				if (collisionGrid[6][4] == 5)
+				{
+					t.innerHTML = "The GHOST is decidedly spooky.";
+				}
+				else
+				{
+					collisionGrid[7][1] = 0;
+					update();
+					t.innerHTML = "The GHOST finds comfort in your tender embrace, and reveals the convenience store's hidden passageways.";
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 5)
+			{
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				collisionGrid[xTarget][yTarget] = 0;
+				backgroundColor = "green";
+				update();
+				t.innerHTML = "NIGHT VISION GOGGLES are certainly out of place in the supermarket.";
+			}
+		}
+		
+		function initEnvironment()
+		{	
+			for (i = 1; i < 7; i++)
+			{
+				collisionGrid[i][0] = 2;
+			}
+			for (i = 0; i < 5; i++)
+			{
+				collisionGrid[0][i] = 2;
+				collisionGrid[7][i] = 2;
+			}
+			for (i = 0; i < 8; i++)
+			{
+				if (i == 4)
+				{
+					collisionGrid[i][5] = 2;
+				}
+				else
+				{
+					collisionGrid[i][5] = 3;
+				}
+			}
+			collisionGrid[2][3] = 1;
+			collisionGrid[3][3] = 1;
+			collisionGrid[4][3] = 1;
+			collisionGrid[4][4] = 1;
+			collisionGrid[5][4] = 1;
+			collisionGrid[4][1] = 1;
+			collisionGrid[6][2] = 1;
+			collisionGrid[2][2] = 4;
+			collisionGrid[6][4] = 5;
+		}
+		
+		function drawEnvironment()
+		{
+			for (i = 0; i < c.width/gridSize; i++)
+			{
+				for (j = 0; j < c.height/gridSize; j++)
+				{
+					if (backgroundColor != "black")
+					{
+						if (collisionGrid[i][j] == 1)
+						{
+							ctx.drawImage(shelfImg, i*gridSize, j*gridSize);
+						}
+						else if (collisionGrid[i][j] == 2)
+						{
+							ctx.drawImage(brickImg, i*gridSize, j*gridSize);
+						}
+						else if (collisionGrid[i][j] == 3)
+						{
+							if (i == 0)
+							{
+								ctx.drawImage(outsideImg, i*gridSize, j*gridSize);
+							}
+						}
+						else if (collisionGrid[i][j] == 4)
+						{
+							ctx.drawImage(ghostImg, i*gridSize, j*gridSize);
+						}
+						else if (collisionGrid[i][j] == 5)
+						{
+							ctx.drawImage(goggleImg, i*gridSize, j*gridSize);
+						}
+					}
+				}
+			}
+		}
+    </script>
+	</body>
+</html>
