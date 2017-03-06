@@ -190,6 +190,10 @@
 			if (xTarget < 0)
 			{
 				window.location.href = "S.html";
+			}
+			else if (yTarget < 0)
+			{
+				window.location.href = "E.html";
 			}			
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
@@ -235,6 +239,8 @@
 				{
 					collisionGrid[0][3] = 0;
 					collisionGrid[0][4] = 0;
+					collisionGrid[1][0] = 0;
+					collisionGrid[2][0] = 0;
 					update();
 					t.innerHTML = "The PIRATE kisses you passionately and sends you on your way."
 				}

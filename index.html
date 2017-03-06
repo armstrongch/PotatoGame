@@ -162,6 +162,10 @@
 			else if (xTarget < 0)
 			{
 				window.location.href = "W.html";
+			}
+			else if (xTarget > 7)
+			{
+				window.location.href = "E.html";
 			}			
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
@@ -199,6 +203,8 @@
 					collisionGrid[0][3] = 0;
 					collisionGrid[5][5] = 0;
 					collisionGrid[6][5] = 0;
+					collisionGrid[7][3] = 0;
+					collisionGrid[7][4] = 0;
 					update();
 					t.innerHTML = "You pray at the ALTAR OF THE FOREST. The forest gods offer their blessings for your journey.";
 				}
