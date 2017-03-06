@@ -154,6 +154,10 @@
 			if (xTarget > 7)
 			{
 				window.location.href = "index.html";
+			}		
+			if (yTarget < 0)
+			{
+				window.location.href = "NW.html";
 			}				
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
@@ -200,6 +204,7 @@
 				else
 				{
 					collisionGrid[7][1] = 0;
+					collisionGrid[3][0] = 0;
 					update();
 					t.innerHTML = "The GHOST finds comfort in your tender embrace, and reveals the convenience store's hidden passageways.";
 				}

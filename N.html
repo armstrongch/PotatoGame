@@ -161,7 +161,11 @@
 			if (yTarget > 5)
 			{
 				window.location.href = "index.html";;
-			}			
+			}	
+			else if (xTarget < 0)
+			{
+				window.location.href = "NW.html";;
+			}				
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
 				player.xPos = xTarget;
@@ -228,6 +232,7 @@
 							}
 						}
 						collisionGrid[4][5] = 0;
+						collisionGrid[0][2] = 0;
 						update();
 						t.innerHTML = "The bovine gods smile upon you.";
 					}

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Potato Lad</title>
+		<meta charset="utf-8" />
+		<style>
+		canvas 
+		{
+			display: block;
+			margin: auto;
+		}	
+		</style>
+	</head>
+	<body onload="roomStart()">
+	<div>
+		<canvas id="myCanvas" width=512, height = 384, style="border:1px solid #000000;" />
+	</div>
+	<h1 id="text" style = "text-align: center">Loading</h1>
+    <script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var gridSize = 32;
+		var backgroundColor = "#FF9763";
+		var collisionGrid = new Array();
+		var q;
+		var t = document.getElementById("text");
+		var pumpkinX = 6;
+		var pumpkinY = 4;
+		var imagesLoaded = [false, false, false];
+		var allImagesLoaded = false;
+		
+		var potatoImg = new Image(gridSize, gridSize);
+		potatoImg.src = "NW\\Potato.png";
+		potatoImg.onload = LI(0);
+		
+		var cornImg = new Image(gridSize, gridSize);
+		cornImg.src = "NW\\Corn.png";
+		cornImg.onload = LI(1);
+		
+		var pumpkinImg = new Image(gridSize, gridSize);
+		pumpkinImg.src = "NW\\Pumpkin.png";
+		pumpkinImg.onload = LI(2);
+		
+		var player =
+		{
+			xPos: 1,
+			yPos: 1
+		};
+		
+		function LI(n)
+		{
+			imagesLoaded[n] = true;
+			var sum = 0;
+			for (i = 0; i < imagesLoaded.length; i++)
+			{
+				sum += imagesLoaded[i];
+			}
+			if (sum == imagesLoaded.length)
+			{
+				allImagesLoaded = true;
+			}
+		}
+		
+		function roomStart()
+		{
+			t.innerHTML = "Loading";
+			while(!allImagesLoaded)
+			{
+				//WAIT
+			}
+			ctx.scale(2,2);
+			for (i = 0; i < c.width/gridSize; i += 1)
+			{
+				collisionGrid[i] = new Array();
+				for (j = 0; j < c.height/gridSize; j += 1)
+				{
+					collisionGrid[i][j] = 0;
+				}
+			}
+			initEnvironment();
+			update();
+			document.addEventListener("keydown", keyDown);
+			t.innerHTML = "Use the Arrow Keys.";
+		}
+		
+		function update()
+		{
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, c.width, c.height);
+			drawPlayer();
+			drawEnvironment();
+			drawGrid();
+			t.innerHTML = "";
+		} 
+		
+		function drawGrid()
+		{
+			for (i = 0; i < c.width; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(i, 0);
+				ctx.lineTo(i, c.height);
+				ctx.stroke();
+			}
+			for (i = 0; i < c.height; i += gridSize)
+			{
+				ctx.beginPath();
+				ctx.moveTo(0, i);
+				ctx.lineTo(c.width, i);
+				ctx.stroke();
+			}
+		}
+		
+		function drawPlayer()
+		{
+			ctx.drawImage(potatoImg, player.xPos*gridSize, player.yPos*gridSize);
+		}
+		
+		function keyDown(e)
+		{
+			var keyCode = e.keyCode;
+			var xTarget = player.xPos;
+			var yTarget = player.yPos;
+			//Up = 38
+			if (keyCode == 38)
+			{
+				yTarget -= 1;
+				if (collisionGrid[pumpkinX][pumpkinY + 1] == 0)
+				{
+					collisionGrid[pumpkinX][pumpkinY] = 0;
+					pumpkinY++;
+					collisionGrid[pumpkinX][pumpkinY] = 2;
+					if ((pumpkinX == player.xPos) && (pumpkinY == player.yPos))
+					{
+						collisionGrid[3][5] = 0;
+						collisionGrid[4][5] = 0;
+						collisionGrid[7][2] = 0;
+						collisionGrid[7][3] = 0;
+					}
+				}
+			}
+			//Down = 40
+			if (keyCode == 40)
+			{
+				yTarget += 1;
+				if (collisionGrid[pumpkinX][pumpkinY - 1] == 0)
+				{
+					collisionGrid[pumpkinX][pumpkinY] = 0;
+					pumpkinY--;
+					collisionGrid[pumpkinX][pumpkinY] = 2;
+					if ((pumpkinX == player.xPos) && (pumpkinY == player.yPos))
+					{
+						collisionGrid[3][5] = 0;
+						collisionGrid[4][5] = 0;
+						collisionGrid[7][2] = 0;
+						collisionGrid[7][3] = 0;
+					}
+				}
+			}
+			//Left = 37
+			if (keyCode == 37)
+			{
+				if (collisionGrid[pumpkinX + 1][pumpkinY] == 0)
+				{
+					collisionGrid[pumpkinX][pumpkinY] = 0;
+					pumpkinX++;
+					collisionGrid[pumpkinX][pumpkinY] = 2;
+					if ((pumpkinX == player.xPos) && (pumpkinY == player.yPos))
+					{
+						collisionGrid[3][5] = 0;
+						collisionGrid[4][5] = 0;
+						collisionGrid[7][2] = 0;
+						collisionGrid[7][3] = 0;
+					}
+				}
+				xTarget -= 1;
+			}
+			//Right = 39
+			if (keyCode == 39)
+			{
+				if (collisionGrid[pumpkinX - 1][pumpkinY] == 0)
+				{
+					collisionGrid[pumpkinX][pumpkinY] = 0;
+					pumpkinX--;
+					collisionGrid[pumpkinX][pumpkinY] = 2;
+					if ((pumpkinX == player.xPos) && (pumpkinY == player.yPos))
+					{
+						collisionGrid[3][5] = 0;
+						collisionGrid[4][5] = 0;
+						collisionGrid[7][2] = 0;
+						collisionGrid[7][3] = 0;
+					}
+				}
+				xTarget += 1;
+			}
+			if (xTarget > 7)
+			{
+				window.location.href = "N.html";
+			}	
+			else if (yTarget > 5)
+			{
+				window.location.href = "W.html";
+			}			
+			else if (collisionGrid[xTarget][yTarget] == 0)
+			{
+				player.xPos = xTarget;
+				player.yPos = yTarget;
+				update();
+				if (collisionGrid[3][5] == 0)
+				{
+					t.innerHTML = "The PUMPKIN'S love has no bounds. As the cornfield opens, so does your heart.";
+				}
+			}
+			else if (collisionGrid[xTarget][yTarget] == 1)
+			{
+				update();
+				t.innerHTML = "The CORN whispers sweet nothings into your ears.";
+			}
+		}
+		
+		function initEnvironment()
+		{	
+			for (i = 0; i < 8; i++)
+			{
+				collisionGrid[i][0] = 1;
+				collisionGrid[i][5] = 1;
+			}
+			for (i = 1; i < 5; i++)
+			{
+				collisionGrid[0][i] = 1;
+				collisionGrid[7][i] = 1;
+			}
+			collisionGrid[2][2] = 1;
+			collisionGrid[3][2] = 1;
+			collisionGrid[4][2] = 1;
+			collisionGrid[3][3] = 1;
+			collisionGrid[5][3] = 1;
+			collisionGrid[6][4] = 2;
+		}
+		
+		function drawEnvironment()
+		{
+			for (i = 0; i < c.width/gridSize; i++)
+			{
+				for (j = 0; j < c.height/gridSize; j++)
+				{
+					if (collisionGrid[i][j] == 1)
+					{
+						ctx.drawImage(cornImg, i*gridSize, j*gridSize);
+					}
+					else if (collisionGrid[i][j] == 2)
+					{
+						ctx.drawImage(pumpkinImg, i*gridSize, j*gridSize);
+					}
+				}
+			}
+		}
+    </script>
+	</body>
+</html>
