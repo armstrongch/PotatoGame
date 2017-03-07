@@ -155,9 +155,13 @@
 			{
 				window.location.href = "index.html";
 			}		
-			if (yTarget < 0)
+			else if (yTarget < 0)
 			{
 				window.location.href = "NW.html";
+			}
+			else if (yTarget > 5)
+			{
+				window.location.href = "SW.html";
 			}				
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
@@ -205,6 +209,8 @@
 				{
 					collisionGrid[7][1] = 0;
 					collisionGrid[3][0] = 0;
+					collisionGrid[4][4] = 0;
+					collisionGrid[4][5] = 0;
 					update();
 					t.innerHTML = "The GHOST finds comfort in your tender embrace, and reveals the convenience store's hidden passageways.";
 				}
@@ -214,7 +220,7 @@
 				player.xPos = xTarget;
 				player.yPos = yTarget;
 				collisionGrid[xTarget][yTarget] = 0;
-				backgroundColor = "green";
+				backgroundColor = "#C8E8C5";
 				update();
 				t.innerHTML = "NIGHT VISION GOGGLES are certainly out of place in the supermarket.";
 			}

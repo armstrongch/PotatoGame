@@ -20,48 +20,48 @@
 		var c = document.getElementById("myCanvas");
 		var ctx = c.getContext("2d");
 		var gridSize = 32;
-		var backgroundColor = "#FCD0A1";
+		var backgroundColor = "#B3CDD1";
 		var collisionGrid = new Array();
 		var q;
 		var t = document.getElementById("text");
-		var imagesLoaded = [false, false, false, false, false, false, false];
-		var allImagesLoaded = false;
+		//var imagesLoaded = [false, false, false, false, false, false];
+		//var allImagesLoaded = false;
 		
 		var potatoImg = new Image(gridSize, gridSize);
-		potatoImg.src = "S\\Potato.png";
-		potatoImg.onload = LI(0);
+		potatoImg.src = "SW\\Potato.png";
+		//potatoImg.onload = LI(0);
 		
-		var cactusImg = new Image(gridSize, gridSize);
-		cactusImg.src = "S\\Cactus.png";
-		cactusImg.onload = LI(1);
+		var treeImg = new Image(gridSize, gridSize);
+		treeImg.src = "SW\\Tree.png";
+		//treeImg.onload = LI(1);
 		
-		var camelImg = new Image(gridSize, gridSize);
-		camelImg.src = "S\\Camel.png";
-		camelImg.onload = LI(2);
+		var yetiImg = new Image(gridSize, gridSize);
+		yetiImg.src = "SW\\Yeti.png";
+		//yetiImg.onload = LI(2);
 		
-		var bearImg = new Image(gridSize, gridSize);
-		bearImg.src = "S\\Bear.png";
-		bearImg.onload = LI(3);
+		var SM1Img = new Image(gridSize, gridSize);
+		SM1Img.src = "SW\\SM1.png";
+		//SM1Img.onload = LI(3);
 		
-		var pineappleImg = new Image(gridSize, gridSize);
-		pineappleImg.src = "S\\Pineapple.png";
-		pineappleImg.onload = LI(4);
+		var SM2Img = new Image(gridSize, gridSize);
+		SM2Img.src = "SW\\SM2.png";
+		//SM2Img.onload = LI(4);
 		
-		var bathImg = new Image(gridSize, gridSize);
-		bathImg.src = "S\\Bath.png";
-		bathImg.onload = LI(5);
+		var SM3Img = new Image(gridSize, gridSize);
+		SM3Img.src = "SW\\SM3.png";
+		//SM3Img.onload = LI(5);
 		
-		var camelBathImg = new Image(gridSize, gridSize);
-		camelBathImg.src = "S\\CamelBath.png";
-		camelBathImg.onload = LI(6);
+		var tree2Img = new Image(gridSize, gridSize);
+		tree2Img.src = "SW\\Tree2.png";
+		//tree2Img.onload = LI(6);
 		
 		var player =
 		{
-			xPos: 1,
-			yPos: 4
+			xPos: 2,
+			yPos: 2
 		};
 		
-		function LI(n)
+		/*function LI(n)
 		{
 			imagesLoaded[n] = true;
 			var sum = 0;
@@ -73,15 +73,15 @@
 			{
 				allImagesLoaded = true;
 			}
-		}
+		}*/
 		
 		function roomStart()
 		{
 			t.innerHTML = "Loading";
-			while(!allImagesLoaded)
+			/*while(!allImagesLoaded)
 			{
 				//WAIT
-			}
+			}*/
 			ctx.scale(2,2);
 			for (i = 0; i < c.width/gridSize; i += 1)
 			{
@@ -157,75 +157,67 @@
 			}
 			if (yTarget < 0)
 			{
-				window.location.href = "index.html";
+				window.location.href = "W.html";
 			}	
 			else if (xTarget > 7)
 			{
-				window.location.href = "SE.html";
-			}	
-			else if (xTarget < 0)
-			{
-				window.location.href = "SW.html";
-			}				
+				window.location.href = "S.html";
+			}			
 			else if (collisionGrid[xTarget][yTarget] == 0)
 			{
-				if (collisionGrid[5][player.yPos] == 2)
-				{
-					collisionGrid[5][player.yPos] = 0;
-					player.xPos = xTarget;
-					player.yPos = yTarget;
-					if (collisionGrid[5][player.yPos] == 5)
-					{
-						collisionGrid[5][player.yPos] = 6;
-					}
-					else
-					{
-						collisionGrid[5][player.yPos] = 2;
-					}
-				}
-				else
-				{
-					player.xPos = xTarget;
-					player.yPos = yTarget;
-				}
+				player.xPos = xTarget;
+				player.yPos = yTarget;
 				update();
 			}
 			else if (collisionGrid[xTarget][yTarget] == 1)
 			{
-				t.innerHTML = "The CACTUS is polite and sophisticated, despite it's needles.";
+				t.innerHTML = "The TREES sway uneasily in the winter breeze."
 			}
 			else if (collisionGrid[xTarget][yTarget] == 2)
 			{
-				t.innerHTML = "The disgruntled CAMEL is in dire need of a bath.";
-			}
-			else if (collisionGrid[xTarget][yTarget] == 3)
-			{
-				if (collisionGrid[6][2] == 0)
+				if ((collisionGrid[4][1] == 4) 
+				&& (collisionGrid[6][1] == 5) 
+				&& (collisionGrid[4][3] == 5) 
+				&& (collisionGrid[6][3] == 3))
 				{
-					collisionGrid[3][0] = 0;
-					collisionGrid[7][1] = 0;
+					for (i = 0; i < 8; i++)
+					{
+						collisionGrid[i][0] = 6;
+						collisionGrid[i][5] = 6;
+					}
+					for (i = 1; i < 5; i++)
+					{
+						collisionGrid[0][i] = 6;
+						collisionGrid[7][i] = 6;
+					}
+					collisionGrid[5][0] = 0;
 					collisionGrid[7][2] = 0;
-					collisionGrid[0][1] = 0;
-					collisionGrid[0][2] = 0;
 					update();
-					t.innerHTML = "The PINEAPPLE is an excellent addition to the stew. In gratitude, the WIZARD molds the CACTUS fields to his will, forming a path.";
+					t.innerHTML = "The YETI finds the SNOWMEN aesthetically pleasing. The trees dance with jubilance.";
 				}
 				else
 				{
-					t.innerHTML = "The WIZARD needs a few more ingredients for his stew.";
+					t.innerHTML = "The YETI whispers cryptically into your ear: \"2331\""
 				}
 			}
-			else if (collisionGrid[xTarget][yTarget] == 4)
+			else if ((collisionGrid[xTarget][yTarget] == 3) 
+			|| (collisionGrid[xTarget][yTarget] == 4) 
+			|| (collisionGrid[xTarget][yTarget] == 5))
 			{
-				collisionGrid[xTarget][yTarget] = 0;
-				player.xPos = xTarget;
-				player.yPos = yTarget;
+				if (collisionGrid[xTarget][yTarget] == 5)
+				{
+					collisionGrid[xTarget][yTarget] = 3;
+				}
+				else
+				{
+					collisionGrid[xTarget][yTarget]++;
+				}
 				update();
-				t.innerHTML = "This PINEAPPLE would be delicious in a stew.";
+				t.innerHTML = "SNOW?!"
 			}
 			else if (collisionGrid[xTarget][yTarget] == 6)
 			{
-				t.innerHTML = "The CAMEL is much cleaner, though equally disgruntled.";
+				t.innerHTML = "The TREES rejoice in every moment, and live life to the fullest."
 			}
 		}
 		
@@ -241,15 +233,11 @@
 				collisionGrid[0][i] = 1;
 				collisionGrid[7][i] = 1;
 			}
-			collisionGrid[3][3] = 1;
-			collisionGrid[4][1] = 1;
-			collisionGrid[4][2] = 1;
-			collisionGrid[2][1] = 1;
-			collisionGrid[5][player.yPos] = 2;
-			collisionGrid[1][3] = 3;
-			collisionGrid[6][2] = 4;
-			collisionGrid[5][1] = 5;
-			
+			collisionGrid[2][4] = 2;
+			collisionGrid[4][1] = 5;
+			collisionGrid[6][1] = 5;
+			collisionGrid[4][3] = 5;
+			collisionGrid[6][3] = 5;
 		}
 		
 		function drawEnvironment()
@@ -260,27 +248,27 @@
 				{
 					if (collisionGrid[i][j] == 1)
 					{
-						ctx.drawImage(cactusImg, i*gridSize, j*gridSize);
+						ctx.drawImage(treeImg, i*gridSize, j*gridSize);
 					}
-					if (collisionGrid[i][j] == 2)
+					else if (collisionGrid[i][j] == 2)
 					{
-						ctx.drawImage(camelImg, i*gridSize, j*gridSize);
+						ctx.drawImage(yetiImg, i*gridSize, j*gridSize);
 					}
-					if (collisionGrid[i][j] == 3)
+					else if (collisionGrid[i][j] == 3)
 					{
-						ctx.drawImage(bearImg, i*gridSize, j*gridSize);
+						ctx.drawImage(SM1Img, i*gridSize, j*gridSize);
 					}
-					if (collisionGrid[i][j] == 4)
+					else if (collisionGrid[i][j] == 4)
 					{
-						ctx.drawImage(pineappleImg, i*gridSize, j*gridSize);
+						ctx.drawImage(SM2Img, i*gridSize, j*gridSize);
 					}
-					if (collisionGrid[i][j] == 5)
+					else if (collisionGrid[i][j] == 5)
 					{
-						ctx.drawImage(bathImg, i*gridSize, j*gridSize);
+						ctx.drawImage(SM3Img, i*gridSize, j*gridSize);
 					}
-					if (collisionGrid[i][j] == 6)
+					else if (collisionGrid[i][j] == 6)
 					{
-						ctx.drawImage(camelBathImg, i*gridSize, j*gridSize);
+						ctx.drawImage(tree2Img, i*gridSize, j*gridSize);
 					}
 				}
 			}
